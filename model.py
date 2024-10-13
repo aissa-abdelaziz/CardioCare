@@ -11,11 +11,13 @@ load_dotenv()
 def _get_client(api_key=os.getenv("MISTRAL_API_KEY")):
     return Mistral(api_key=api_key)
 
+
 def _encode_image_base64(image):
     buffered = BytesIO()
     image.save(buffered, format="PNG")
-    img_bytes = buffered.getvalue() 
+    img_bytes = buffered.getvalue()
     return base64.b64encode(img_bytes).decode("utf-8")  # Encode to base64
+
 
 def get_ocr_results(img, model="pixtral-12b-2409", client=_get_client()):
     img = _encode_image_base64(img)
@@ -88,28 +90,25 @@ def get_ocr_results(img, model="pixtral-12b-2409", client=_get_client()):
                                             | **Triglycerides**     | N/A         | N/A            |
 
                                             ```           
-                                """
+                                """,
                     },
-                    {
-                        "type": "image_url",
-                        "image_url": f"data:image/jpeg;base64,{img}"
-                    },
-                ]
+                    {"type": "image_url", "image_url": f"data:image/jpeg;base64,{img}"},
+                ],
             },
         ],
         temperature=0,
     )
-    
-    return chat_response.choices[0].message.content[15:-3]  
+
+    return chat_response.choices[0].message.content[15:-3]
 
 
 def get_analysis(img, model="mistral-large-latest", client=_get_client()):
     chat_response = client.chat.complete(
-    model = model,
-    messages = [
-        {
-            "role": "user",
-            "content": f"""
+        model=model,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""
                         You are a top cardiologist specializing in coronary artery disease, acute coronary syndrome, and hypercholesterolemia. Your patient has provided their latest lipid test results, and you need to help them correct any parameter that is not at target in a clear and empathetic way.
 
                         Here are the test results:
@@ -133,22 +132,20 @@ def get_analysis(img, model="mistral-large-latest", client=_get_client()):
                             - Analysis: Your total cholesterol level is within the desirable range. It indicates a high risk of heart disease. 🚨
                         ```
                         """,
-        },
-    ],
-    temperature = 0
+            },
+        ],
+        temperature=0,
     )
     return chat_response.choices[0].message.content
 
 
-
-
 def get_tips(img, model="mistral-large-latest", client=_get_client()):
     chat_response = client.chat.complete(
-    model = model,
-    messages = [
-        {
-            "role": "user",
-            "content": f"""
+        model=model,
+        messages=[
+            {
+                "role": "user",
+                "content": f"""
                         You are a top cardiologist specializing in coronary artery disease, acute coronary syndrome, and hypercholesterolemia. Your patient has provided their latest lipid test results, and you need to help them correct any parameter that is not at target in a clear and empathetic way.
 
                         Here are the test results:
@@ -177,8 +174,8 @@ def get_tips(img, model="mistral-large-latest", client=_get_client()):
                         ```
 
                         """,
-        },
-    ],
-    temperature = 0
+            },
+        ],
+        temperature=0,
     )
     return chat_response.choices[0].message.content
